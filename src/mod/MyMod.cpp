@@ -1,16 +1,17 @@
 #include "MyMod.h"
 #include <ll/api/memory/Hook.h>
+#include <ll/api/memory/Memory.h> // Bổ sung thư viện xử lý bộ nhớ
 #include <mc/world/item/Item.h>
 
-// Bắt buộc phải có namespace này để kết nối với MyMod.h
 namespace my_mod {
 
-// Khai báo Hook bằng Symbol (tên mã hóa) thay vì trỏ hàm, giúp bỏ qua lỗi thiếu header
+// Khai báo Hook an toàn
+// Thay vì truyền chuỗi, chúng ta sẽ ép kiểu chuỗi thành SymbolView để hàm resolveIdentifier hiểu được
 LL_TYPE_INSTANCE_HOOK(
     AllowOffhandHook,
     ll::memory::HookPriority::Normal,
     Item,
-    "_ZNK4Item13allowOffhandEv", 
+    ll::memory::SymbolView("_ZNK4Item13allowOffhandEv"), 
     bool
 ) {
     return true; // Ép game luôn cho phép cầm trên tay trái
@@ -18,13 +19,12 @@ LL_TYPE_INSTANCE_HOOK(
 
 bool MyMod::load() {
     getSelf().getLogger().info("Dang tai mod AllOffhand...");
-    // Kích hoạt tính năng can thiệp (Hook)
     ll::memory::HookRegistrar<AllowOffhandHook>().hook();
     return true;
 }
 
 bool MyMod::enable() {
-    getSelf().getLogger().info("Mod da hoat dong! Ban co the cam moi thu o tay trai.");
+    getSelf().getLogger().info("Mod da hoat dong!");
     return true;
 }
 
@@ -32,8 +32,6 @@ bool MyMod::disable() {
     return true;
 }
 
-bool MyMod::unload() {
-    return true;
-}
+// Bỏ hàm unload() đi vì file MyMod.h không yêu cầu hàm này.
 
-} // Kết thúc namespace my_mod
+} // namespace my_mod
