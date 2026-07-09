@@ -1,13 +1,36 @@
-#include "llapi/LoggerAPI.h"
-#include "llapi/HookAPI.h"
-#include "mc/world/item/Item.h"
+#include "MyMod.h"
+#include <ll/api/memory/Hook.h>
+#include <ll/api/mod/NativeMod.h>
+#include <mc/world/item/Item.h>
 
-Logger logger("AllOffhandMod");
+// Khai báo cấu trúc Hook theo chuẩn LeviLamina mới
+LL_TYPE_INSTANCE_HOOK(
+    AllowOffhandHook,
+    ll::memory::HookPriority::Normal,
+    Item,
+    &Item::allowOffhand, // Trình biên dịch sẽ tự động tìm đúng tên hàm
+    bool
+) {
+    return true; // Ép game luôn cho phép cầm trên tay trái
+}
 
-TInstanceHook(bool, "_ZNK4Item13allowOffhandEv", Item) {
+// Khởi tạo mod khi game nạp vào bộ nhớ
+bool MyMod::load() {
+    getSelf().getLogger().info("Dang tai mod AllOffhand...");
+    // Kích hoạt tính năng can thiệp (Hook)
+    ll::memory::HookRegistrar<AllowOffhandHook>().hook();
     return true;
 }
 
-void PluginInit() {
-    logger.info("Mod 'All Items Offhand' da duoc tai thanh cong!");
+bool MyMod::enable() {
+    getSelf().getLogger().info("Mod da hoat dong! Bay gio ban co the cam moi thu o tay trai.");
+    return true;
+}
+
+bool MyMod::disable() {
+    return true;
+}
+
+bool MyMod::unload() {
+    return true;
 }
