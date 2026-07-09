@@ -8,14 +8,14 @@ option("target_type")
     set_values("server", "client")
 option_end()
 
--- add_requires("levilamina x.x.x") for a specific version
--- add_requires("levilamina develop") to use develop version
--- please note that you should add bdslibrary yourself if using dev version
 add_requires("levilamina", {configs = {target_type = get_config("target_type")}})
 
 add_requires("levibuildscript")
 
-if not has_config("vs_runtime") then
+-- Đã sửa: Phân loại rõ cấu hình cho Android và Windows
+if is_plat("android") then
+    set_runtimes("c++_shared")
+elseif not has_config("vs_runtime") then
     set_runtimes("MD")
 end
 
